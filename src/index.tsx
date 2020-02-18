@@ -7,6 +7,10 @@ import {
   State as GestureState,
 } from 'react-native-gesture-handler'
 
+function renumber(str: string) {
+  return (Number(str.split('%')[0]) * screenHeight) / 100
+}
+
 type Props = {
   /**
    * Points for snapping of bottom sheet component. They define distance from bottom of the screen.
@@ -653,11 +657,12 @@ export default class BottomSheetBehavior extends React.Component<Props, State> {
     if (!this.props.enabledImperativeSnapping) {
       return
     }
+
+    this.isManuallySetValue.setValue(1)
     this.manuallySetValue.setValue(
       // @ts-ignore
       this.state.snapPoints[this.state.propsToNewIndices[index]]
     )
-    this.isManuallySetValue.setValue(1)
   }
 
   private height: Animated.Value<number> = new Value(0)
@@ -685,9 +690,6 @@ export default class BottomSheetBehavior extends React.Component<Props, State> {
   }: LayoutChangeEvent) =>
     this.state.heightOfContent.setValue(height - this.state.initSnap)
 
-  static renumber = (str: string) =>
-    (Number(str.split('%')[0]) * screenHeight) / 100
-
   static getDerivedStateFromProps(
     props: Props,
     state: State | undefined
@@ -708,7 +710,7 @@ export default class BottomSheetBehavior extends React.Component<Props, State> {
           if (typeof s === 'number') {
             return { val: s, ind: i }
           } else if (typeof s === 'string') {
-            return { val: BottomSheetBehavior.renumber(s), ind: i }
+            return { val: renumber(s), ind: i }
           }
 
           throw new Error(`Invalid type for value ${s}: ${typeof s}`)
